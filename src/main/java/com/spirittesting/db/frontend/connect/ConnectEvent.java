@@ -6,7 +6,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class ConnectEvent implements EventHandler<ActionEvent> {
 
     private final TextField jdbc;
@@ -21,8 +23,12 @@ public class ConnectEvent implements EventHandler<ActionEvent> {
 
     @Override
     public void handle(ActionEvent actionEvent) {
-        DatabaseViewScene databaseViewScene = new DatabaseViewScene(jdbc.getText(), username.getText(), password.getText());
-        DbAnonymizerApplication.primaryStage.setScene(databaseViewScene);
+        try {
+            DatabaseViewScene databaseViewScene = new DatabaseViewScene(jdbc.getText(), username.getText(), password.getText());
+            DbAnonymizerApplication.primaryStage.setScene(databaseViewScene);
+        } catch (Exception e) {
+            log.error("Error loading Database Scene", e);
+        }
     }
 
 }

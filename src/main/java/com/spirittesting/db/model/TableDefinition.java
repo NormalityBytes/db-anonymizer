@@ -9,5 +9,10 @@ public record TableDefinition(
         String typeName,
         String selfReferencingColName,
         String refGeneration
-) {
+) implements Comparable<TableDefinition> {
+
+    @Override
+    public int compareTo(TableDefinition o) {
+        return descriptor.compareTo(o.descriptor);
+    }
 }

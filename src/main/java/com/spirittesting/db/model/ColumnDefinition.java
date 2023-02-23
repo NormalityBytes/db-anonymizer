@@ -18,5 +18,10 @@ public record ColumnDefinition(
         Optional<Boolean> autoIncrement,
         Optional<Boolean> generatedColumn
 
-) {
+) implements Comparable<ColumnDefinition> {
+
+    @Override
+    public int compareTo(ColumnDefinition o) {
+        return descriptor.compareTo(o.descriptor);
+    }
 }

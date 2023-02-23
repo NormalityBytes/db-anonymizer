@@ -1,9 +1,7 @@
 package com.spirittesting.db.model;
 
 public record IndexDefinition(
-        String catalog,
-        String schema,
-        String table,
+        TableDescriptor table,
         boolean nonUnique,
         String indexQualifier,
         String indexName,

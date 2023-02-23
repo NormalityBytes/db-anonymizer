@@ -27,21 +27,6 @@ public class Reader {
         this.password = password;
     }
 
-    public static void main(String[] args) {
-        Reader reader = new Reader("jdbc:postgresql://localhost:5432/profiler", "profiler", "profiler");
-
-        Set<ColumnDefinition> columnDefinitions = reader.getColumnDefinitions();
-        columnDefinitions.forEach(x -> log.info("" + x));
-
-        columnDefinitions.stream().map(def -> def.descriptor().table()).distinct().forEach(tableDescriptor -> {
-            reader.getIndexDefinitions(tableDescriptor).forEach(x -> log.info("" + x));
-            reader.getForeignKeyDefinitions(tableDescriptor).forEach(x -> log.info("" + x));
-        });
-
-        reader.disconnect();
-
-    }
-
     private Connection connect(String jdbc, String username, String password) {
         log.info("Connecting to {} with user {}", jdbc, username);
         Driver driver = new Driver();
@@ -52,16 +37,6 @@ public class Reader {
             Connection connection = driver.connect(jdbc, props);
             assert connection != null;
             return connection;
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void disconnect() {
-        if (_connection.get() == null) return;
-        log.info("Disconnecting from database");
-        try {
-            _connection.get().close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -90,52 +65,66 @@ public class Reader {
         return _connection.get();
     }
 
+    public Set<ColumnDefinition> getColumnDefinitions(TableDescriptor tableDescriptor) {
+        try {
+            ResultSet resultSet = getConnection().getMetaData().getColumns(tableDescriptor.catalog(), tableDescriptor.schema(), tableDescriptor.table(), null);
+            return parseColumnDefinitions(resultSet);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public Set<ColumnDefinition> getColumnDefinitions() {
+        try {
+            ResultSet resultSet = getConnection().getMetaData().getColumns(null, null, null, null);
+            return parseColumnDefinitions(resultSet);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Set<ColumnDefinition> parseColumnDefinitions(ResultSet resultSet) {
         Set<ColumnDefinition> columnDefinitions = new HashSet<>();
         try {
-            for (TableDefinition tableDefinition : getTableDefinitions()) {
-                if (!"TABLE".equals(tableDefinition.type())) continue;
-                ResultSet resultSet = getConnection().getMetaData().getColumns(tableDefinition.descriptor().catalog(), tableDefinition.descriptor().schema(), tableDefinition.descriptor().table(), null);
-                while (resultSet.next()) {
-                    columnDefinitions.add(new ColumnDefinition(
-                            new ColumnDescriptor(
-                                    new TableDescriptor(
-                                            resultSet.getString("TABLE_CAT"),
-                                            resultSet.getString("TABLE_SCHEM"),
-                                            resultSet.getString("TABLE_NAME")
-                                    ),
-                                    resultSet.getString("COLUMN_NAME")
-                            ),
-                            resultSet.getInt("DATA_TYPE"),
-                            resultSet.getString("TYPE_NAME"),
-                            resultSet.getInt("COLUMN_SIZE"),
-                            resultSet.getInt("DECIMAL_DIGITS"),
-                            resultSet.getInt("NUM_PREC_RADIX"),
-                            switch (resultSet.getInt("NULLABLE")) {
-                                case DatabaseMetaData.columnNoNulls -> Optional.of(false);
-                                case DatabaseMetaData.columnNullable -> Optional.of(true);
-                                default -> Optional.empty();
-                            },
-                            resultSet.getString("REMARKS"),
-                            resultSet.getString("COLUMN_DEF"),
-                            resultSet.getInt("CHAR_OCTET_LENGTH"),
-                            resultSet.getInt("ORDINAL_POSITION"),
-                            resultSet.getString("SCOPE_CATALOG"),
-                            resultSet.getString("SCOPE_SCHEMA"),
-                            resultSet.getString("SCOPE_TABLE"),
-                            resultSet.getInt("SOURCE_DATA_TYPE"),
-                            switch (resultSet.getString("IS_AUTOINCREMENT")) {
-                                case "YES" -> Optional.of(true);
-                                case "NO" -> Optional.of(false);
-                                default -> Optional.empty();
-                            },
-                            switch (resultSet.getString("IS_GENERATEDCOLUMN")) {
-                                case "YES" -> Optional.of(true);
-                                case "NO" -> Optional.of(false);
-                                default -> Optional.empty();
-                            }
-                    ));
-                }
+            while (resultSet.next()) {
+                columnDefinitions.add(new ColumnDefinition(
+                        new ColumnDescriptor(
+                                new TableDescriptor(
+                                        resultSet.getString("TABLE_CAT"),
+                                        resultSet.getString("TABLE_SCHEM"),
+                                        resultSet.getString("TABLE_NAME")
+                                ),
+                                resultSet.getString("COLUMN_NAME")
+                        ),
+                        resultSet.getInt("DATA_TYPE"),
+                        resultSet.getString("TYPE_NAME"),
+                        resultSet.getInt("COLUMN_SIZE"),
+                        resultSet.getInt("DECIMAL_DIGITS"),
+                        resultSet.getInt("NUM_PREC_RADIX"),
+                        switch (resultSet.getInt("NULLABLE")) {
+                            case DatabaseMetaData.columnNoNulls -> Optional.of(false);
+                            case DatabaseMetaData.columnNullable -> Optional.of(true);
+                            default -> Optional.empty();
+                        },
+                        resultSet.getString("REMARKS"),
+                        resultSet.getString("COLUMN_DEF"),
+                        resultSet.getInt("CHAR_OCTET_LENGTH"),
+                        resultSet.getInt("ORDINAL_POSITION"),
+                        resultSet.getString("SCOPE_CATALOG"),
+                        resultSet.getString("SCOPE_SCHEMA"),
+                        resultSet.getString("SCOPE_TABLE"),
+                        resultSet.getInt("SOURCE_DATA_TYPE"),
+                        switch (resultSet.getString("IS_AUTOINCREMENT")) {
+                            case "YES" -> Optional.of(true);
+                            case "NO" -> Optional.of(false);
+                            default -> Optional.empty();
+                        },
+                        switch (resultSet.getString("IS_GENERATEDCOLUMN")) {
+                            case "YES" -> Optional.of(true);
+                            case "NO" -> Optional.of(false);
+                            default -> Optional.empty();
+                        }
+                ));
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
@@ -176,14 +165,22 @@ public class Reader {
             ResultSet resultSet = metaData.getImportedKeys(tableDescriptor.catalog(), tableDescriptor.schema(), tableDescriptor.table());
             while (resultSet.next()) {
                 foreignKeyDefinitions.add(new ForeignKeyDefinition(
-                        resultSet.getString("PKTABLE_CAT"),
-                        resultSet.getString("PKTABLE_SCHEM"),
-                        resultSet.getString("PKTABLE_NAME"),
-                        resultSet.getString("PKCOLUMN_NAME"),
-                        resultSet.getString("FKTABLE_CAT"),
-                        resultSet.getString("FKTABLE_SCHEM"),
-                        resultSet.getString("FKTABLE_NAME"),
-                        resultSet.getString("FKCOLUMN_NAME"),
+                        new ColumnDescriptor(
+                                new TableDescriptor(
+                                        resultSet.getString("PKTABLE_CAT"),
+                                        resultSet.getString("PKTABLE_SCHEM"),
+                                        resultSet.getString("PKTABLE_NAME")
+                                ),
+                                resultSet.getString("PKCOLUMN_NAME")
+                        ),
+                        new ColumnDescriptor(
+                                new TableDescriptor(
+                                        resultSet.getString("FKTABLE_CAT"),
+                                        resultSet.getString("FKTABLE_SCHEM"),
+                                        resultSet.getString("FKTABLE_NAME")
+                                ),
+                                resultSet.getString("FKCOLUMN_NAME")
+                        ),
                         resultSet.getShort("KEY_SEQ"),
                         ForeignKeyDefinition.UpdateRule.fromValue(resultSet.getShort("UPDATE_RULE")),
                         ForeignKeyDefinition.UpdateRule.fromValue(resultSet.getShort("DELETE_RULE")),
@@ -205,9 +202,10 @@ public class Reader {
             ResultSet resultSet = metaData.getIndexInfo(tableDescriptor.catalog(), tableDescriptor.schema(), tableDescriptor.table(), false, false);
             while (resultSet.next()) {
                 indexDefinitions.add(new IndexDefinition(
-                        resultSet.getString("TABLE_CAT"),
-                        resultSet.getString("TABLE_SCHEM"),
-                        resultSet.getString("TABLE_NAME"),
+                        new TableDescriptor(
+                                resultSet.getString("TABLE_CAT"),
+                                resultSet.getString("TABLE_SCHEM"),
+                                resultSet.getString("TABLE_NAME")),
                         resultSet.getBoolean("NON_UNIQUE"),
                         resultSet.getString("INDEX_QUALIFIER"),
                         resultSet.getString("INDEX_NAME"),

@@ -1,14 +1,8 @@
 package com.spirittesting.db.model;
 
 public record ForeignKeyDefinition(
-        String pkCatalog,
-        String pkSchema,
-        String pkTable,
-        String pkColumn,
-        String fkCatalog,
-        String fkSchema,
-        String fkTable,
-        String fkColumn,
+        ColumnDescriptor primaryKey,
+        ColumnDescriptor foreignKey,
         int keySeq,
         UpdateRule updateRule,
         UpdateRule deleteRule,
@@ -25,10 +19,6 @@ public record ForeignKeyDefinition(
 
         Deferrability(int value) {
             this.value = value;
-        }
-
-        public int getValue() {
-            return value;
         }
 
         public static Deferrability fromValue(int value) {
