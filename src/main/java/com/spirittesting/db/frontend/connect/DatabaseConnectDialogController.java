@@ -2,15 +2,8 @@ package com.spirittesting.db.frontend.connect;
 
 import com.spirittesting.db.database.ConnectionFactory;
 import com.spirittesting.db.database.ConnectionProperty;
-import com.spirittesting.db.frontend.DbAnonymizerApplication;
-import javafx.beans.InvalidationListener;
-import javafx.beans.binding.StringExpression;
-import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.beans.property.StringPropertyBase;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,10 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.stage.Stage;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.IOException;
 import java.net.URL;
@@ -54,8 +44,8 @@ public class DatabaseConnectDialogController implements Initializable {
         propertiesTable.getItems().add(new EditableConnectionProperty("password", "testoffice"));
         propertiesTable.getItems().add(new EditableConnectionProperty("foo", "bar"));
 
-        keyColumn.setCellValueFactory(data -> data.getValue().getKey());
-        valueColumn.setCellValueFactory(data -> data.getValue().getValue());
+        keyColumn.setCellValueFactory(data -> data.getValue().keyProperty());
+        valueColumn.setCellValueFactory(data -> data.getValue().valueProperty());
 
         connectButton.addEventHandler(ActionEvent.ACTION, event -> {
             ConnectionFactory.getInstance().setJdbc(jdbcUrlText.getText());
@@ -75,11 +65,7 @@ public class DatabaseConnectDialogController implements Initializable {
     }
 
     private class EditableConnectionProperty {
-        @Getter
-        @Setter
         private StringProperty key;
-        @Getter
-        @Setter
         private StringProperty value;
 
         public EditableConnectionProperty(String key, String value) {
@@ -89,6 +75,22 @@ public class DatabaseConnectDialogController implements Initializable {
 
         public ConnectionProperty toConnectionProperty() {
             return new ConnectionProperty(key.get(), value.get());
+        }
+
+        public StringProperty keyProperty() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key.set(key);
+        }
+
+        public StringProperty valueProperty() {
+            return value;
+        }
+
+        public void setValue(String value) {
+            this.value.set(value);
         }
     }
 }

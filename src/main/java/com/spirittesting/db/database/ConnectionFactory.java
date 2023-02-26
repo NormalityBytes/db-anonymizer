@@ -1,10 +1,5 @@
 package com.spirittesting.db.database;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.Synchronized;
-import lombok.extern.slf4j.Slf4j;
-
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.SQLException;
@@ -12,7 +7,6 @@ import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
 
-@Slf4j
 public class ConnectionFactory {
 
     private static ConnectionFactory instance;
@@ -20,7 +14,6 @@ public class ConnectionFactory {
     private ConnectionFactory() {
     }
 
-    @Synchronized
     public static ConnectionFactory getInstance() {
         if (instance == null) {
             instance = new ConnectionFactory();
@@ -28,10 +21,7 @@ public class ConnectionFactory {
         return instance;
     }
 
-    @Getter
-    @Setter
     private String jdbc;
-    @Getter
     private final Set<ConnectionProperty> connectionProperties = new HashSet<>();
 
     public void clearConnectionProperties() {
@@ -55,10 +45,19 @@ public class ConnectionFactory {
             }
             return driver.connect(jdbc, properties);
         } catch (SQLException e) {
-            log.error("Fehler beim Erstellen der Datenbankverbindung", e);
             throw new RuntimeException(e);
         }
     }
 
+    public String getJdbc() {
+        return jdbc;
+    }
 
+    public void setJdbc(String jdbc) {
+        this.jdbc = jdbc;
+    }
+
+    public Set<ConnectionProperty> getConnectionProperties() {
+        return connectionProperties;
+    }
 }

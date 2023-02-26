@@ -12,52 +12,20 @@
         <maven.compiler.source>19</maven.compiler.source>
         <maven.compiler.target>19</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <moduleName>com.spirittesting.dbanonymizer</moduleName>
+        <mainClass>com.spirittesting.db.frontend.DbAnonymizerApplication</mainClass>
 
         <compiler-plugin.version>3.10.1</compiler-plugin.version>
         <javafx-plugin.version>0.0.8</javafx-plugin.version>
 
         <checker-qual.version>3.31.0</checker-qual.version>
         <javafx.version>19.0.2</javafx.version>
-        <lombok.version>1.18.24</lombok.version>
         <logback.version>1.2.11</logback.version>
         <postgresql.version>42.3.8</postgresql.version>
         <slf4j.version>1.7.36</slf4j.version>
     </properties>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-core</artifactId>
-                <version>${logback.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>ch.qos.logback</groupId>
-                <artifactId>logback-classic</artifactId>
-                <version>${logback.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${lombok.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
@@ -83,31 +51,40 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>${javafx-plugin.version}</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.10.1</version>
                 <configuration>
-                    <mainClass>com.spirittesting.dbanonymizer/com.spirittesting.db.frontend.DbAnonymizerApplication</mainClass>
+                    <source>19</source>
+                    <target>19</target>
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <executions>
+                    <execution>
+                        <!-- Default configuration for running with: mvn clean javafx:run -->
+                        <id>default-cli</id>
+                        <configuration>
+                            <mainClass>com.spirittesting.dbanonymizer/com.spirittesting.db.frontend.DbAnonymizerApplication</mainClass>
+                            <launcher>DBAnonymizer</launcher>
+                            <jlinkZipName>DBAnonymizer</jlinkZipName>
+                            <jlinkImageName>DBAnonymizer</jlinkImageName>
+                            <noManPages>true</noManPages>
+                            <stripDebug>true</stripDebug>
+                            <noHeaderFiles>true</noHeaderFiles>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${compiler-plugin.version}</version>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                    <annotationProcessorPaths>
-                        <annotationProcessorPath>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                            <version>${lombok.version}</version>
-                        </annotationProcessorPath>
-                    </annotationProcessorPaths>
-                    <compilerArgs>
-                        <arg>--add-modules</arg>
-                        <arg>javafx.controls</arg>
-                    </compilerArgs>
+                    <outputDirectory>target/jmods</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -116,12 +93,40 @@
                 <version>1.0.0.RC2</version>
                 <executions>
                     <execution>
-                        <id>generate-module-info</id>
-                        <phase>generate-sources</phase>
+                        <id>create-runtime-image</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>generate-module-info</goal>
+                            <goal>create-runtime-image</goal>
                         </goals>
                         <configuration>
+                            <modulePath>
+                                <path>${project.build.directory}/jmods</path>
+                            </modulePath>
+                            <modules>
+                                <module>${moduleName}</module>
+                                <module>javafx.controls</module>
+                                <!--   <module>javafx.controls</module>
+                                <module>javafx.graphics</module> -->
+                            </modules>
+                            <launcher>
+                                <name>test33</name>
+                                <module>${moduleName}/${mainClass}</module>
+                            </launcher>
+                            <compression>2</compression>
+                            <stripDebug>true</stripDebug>
+                            <outputDirectory>${project.build.directory}/jlink-image</outputDirectory>
+                            <jarInclusionPolicy>APP_WITH_DEPENDENCIES</jarInclusionPolicy>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>add-module-info</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>add-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>target/jmods</outputDirectory>
+                            <overwriteExistingFiles>true</overwriteExistingFiles>
                             <modules>
                                 <module>
                                     <artifact>
@@ -129,16 +134,114 @@
                                         <artifactId>checker-qual</artifactId>
                                         <version>${checker-qual.version}</version>
                                     </artifact>
-                                    <moduleInfo>
-                                        <name>org.checkerframework.checker.qual</name>
-                                        <exports>
-                                            *;
-                                        </exports>
-                                        <addServiceUses>true</addServiceUses>
-                                    </moduleInfo>
+                                    <moduleInfoSource>
+                                        module org.checkerframework.checker.qual {
+                                        exports org.checkerframework.checker.builder.qual;
+                                        exports org.checkerframework.checker.calledmethods.qual;
+                                        exports org.checkerframework.checker.compilermsgs.qual;
+                                        exports org.checkerframework.checker.fenum.qual;
+                                        exports org.checkerframework.checker.formatter.qual;
+                                        exports org.checkerframework.checker.guieffect.qual;
+                                        exports org.checkerframework.checker.i18n.qual;
+                                        exports org.checkerframework.checker.i18nformatter.qual;
+                                        exports org.checkerframework.checker.index.qual;
+                                        exports org.checkerframework.checker.initialization.qual;
+                                        exports org.checkerframework.checker.interning.qual;
+                                        exports org.checkerframework.checker.lock.qual;
+                                        exports org.checkerframework.checker.mustcall.qual;
+                                        exports org.checkerframework.checker.nullness.qual;
+                                        exports org.checkerframework.checker.optional.qual;
+                                        exports org.checkerframework.checker.propkey.qual;
+                                        exports org.checkerframework.checker.regex.qual;
+                                        exports org.checkerframework.checker.signature.qual;
+                                        exports org.checkerframework.checker.signedness.qual;
+                                        exports org.checkerframework.checker.tainting.qual;
+                                        exports org.checkerframework.checker.units.qual;
+                                        exports org.checkerframework.common.aliasing.qual;
+                                        exports org.checkerframework.common.initializedfields.qual;
+                                        exports org.checkerframework.common.reflection.qual;
+                                        exports org.checkerframework.common.returnsreceiver.qual;
+                                        exports org.checkerframework.common.subtyping.qual;
+                                        exports org.checkerframework.common.util.report.qual;
+                                        exports org.checkerframework.common.value.qual;
+                                        exports org.checkerframework.dataflow.qual;
+                                        exports org.checkerframework.framework.qual;
+                                        opens org.checkerframework.checker.builder.qual to postgresql;
+                                        opens org.checkerframework.checker.calledmethods.qual to postgresql;
+                                        opens org.checkerframework.checker.compilermsgs.qual to postgresql;
+                                        opens org.checkerframework.checker.fenum.qual to postgresql;
+                                        opens org.checkerframework.checker.formatter.qual to postgresql;
+                                        opens org.checkerframework.checker.guieffect.qual to postgresql;
+                                        opens org.checkerframework.checker.i18n.qual to postgresql;
+                                        opens org.checkerframework.checker.i18nformatter.qual to postgresql;
+                                        opens org.checkerframework.checker.index.qual to postgresql;
+                                        opens org.checkerframework.checker.initialization.qual to postgresql;
+                                        opens org.checkerframework.checker.interning.qual to postgresql;
+                                        opens org.checkerframework.checker.lock.qual to postgresql;
+                                        opens org.checkerframework.checker.mustcall.qual to postgresql;
+                                        opens org.checkerframework.checker.nullness.qual to postgresql;
+                                        opens org.checkerframework.checker.optional.qual to postgresql;
+                                        opens org.checkerframework.checker.propkey.qual to postgresql;
+                                        opens org.checkerframework.checker.regex.qual to postgresql;
+                                        opens org.checkerframework.checker.signature.qual to postgresql;
+                                        opens org.checkerframework.checker.signedness.qual to postgresql;
+                                        opens org.checkerframework.checker.tainting.qual to postgresql;
+                                        opens org.checkerframework.checker.units.qual to postgresql;
+                                        opens org.checkerframework.common.aliasing.qual to postgresql;
+                                        opens org.checkerframework.common.initializedfields.qual to postgresql;
+                                        opens org.checkerframework.common.reflection.qual to postgresql;
+                                        opens org.checkerframework.common.returnsreceiver.qual to postgresql;
+                                        opens org.checkerframework.common.subtyping.qual to postgresql;
+                                        opens org.checkerframework.common.util.report.qual to postgresql;
+                                        opens org.checkerframework.common.value.qual to postgresql;
+                                        opens org.checkerframework.dataflow.qual to postgresql;
+                                        opens org.checkerframework.framework.qual to postgresql;
+                                        }
+                                    </moduleInfoSource>
+                                </module>
+                                <module>
+                                    <artifact>
+                                        <groupId>org.postgresql</groupId>
+                                        <artifactId>postgresql</artifactId>
+                                        <version>${postgresql.version}</version>
+                                    </artifact>
+                                    <moduleInfoSource>
+                                        module org.postgresql.jdbc {
+                                        requires java.management;
+                                        requires transitive java.desktop;
+                                        requires transitive java.logging;
+                                        requires transitive java.naming;
+                                        requires transitive java.security.jgss;
+                                        requires transitive java.security.sasl;
+                                        requires transitive java.sql;
+                                        requires transitive java.transaction.xa;
+                                        requires transitive java.xml;
+                                        provides java.sql.Driver with org.postgresql.Driver;
+                                        }
+                                    </moduleInfoSource>
                                 </module>
                             </modules>
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>process-sources</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeScope>runtime</includeScope>
+                            <outputDirectory>target/jmods</outputDirectory>
+                            <stripClassifier>true</stripClassifier>
+                        </configuration>
+
                     </execution>
                 </executions>
             </plugin>
@@ -151,16 +254,24 @@
                     <appVersion>1.0.0</appVersion>
                     <vendor>com.spirittesting</vendor>
                     <destination>target/dist</destination>
-                    <module>com.spirittesting.dbanonymizer/com.spirittesting.db.frontend.DbAnonymizerApplication</module>
-                    <runtimeImage>${java.home}</runtimeImage>
+                    <runtimeImage>${project.build.directory}/jlink-image</runtimeImage>
+                    <module>${moduleName}/${mainClass}</module>
                     <modulePaths>
-                        <modulePath>target/classes</modulePath>
+                        <modulePath>target/jmods</modulePath>
                     </modulePaths>
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>
                     </javaOptions>
-
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>build installer</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jpackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

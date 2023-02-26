@@ -1,6 +1,5 @@
 package com.spirittesting.db.database;
 
-import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -8,7 +7,6 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-@Slf4j
 public record ForeignKey(
         ColumnId primaryKey,
         ColumnId foreignKey,
@@ -54,7 +52,6 @@ public record ForeignKey(
                 ));
             }
         } catch (SQLException e) {
-            log.error("Fehler beim Abrufen der Fremdschlüssel", e);
             throw new RuntimeException(e);
         }
         return foreignKeys;

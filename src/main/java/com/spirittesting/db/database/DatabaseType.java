@@ -1,11 +1,8 @@
 package com.spirittesting.db.database;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.sql.Driver;
 import java.util.regex.Pattern;
 
-@Slf4j
 public enum DatabaseType {
 
     ORACLE("oracle.jdbc.OracleDriver", "jdbc:oracle:thin:@.*"),
@@ -31,6 +28,7 @@ public enum DatabaseType {
     private final String driver;
     private final Pattern jdbcPattern;
 
+
     DatabaseType(String driver, String jdbcPattern) {
         this.driver = driver;
         this.jdbcPattern = Pattern.compile(jdbcPattern);
@@ -45,10 +43,8 @@ public enum DatabaseType {
                 }
             }
         } catch (Exception e) {
-            log.error("Error while loading driver", e);
             throw new RuntimeException(e);
         }
-        log.error("Unknown JDBC URL: {}", jdbc);
         throw new IllegalArgumentException("Unknown JDBC URL: " + jdbc);
     }
 
