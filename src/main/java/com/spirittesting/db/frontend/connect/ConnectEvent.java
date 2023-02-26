@@ -1,7 +1,8 @@
 package com.spirittesting.db.frontend.connect;
 
+import com.spirittesting.db.database.ConnectionFactory;
+import com.spirittesting.db.database.ConnectionProperty;
 import com.spirittesting.db.frontend.DbAnonymizerApplication;
-import com.spirittesting.db.frontend.databaseview.DatabaseViewScene;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.PasswordField;
@@ -24,8 +25,12 @@ public class ConnectEvent implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent actionEvent) {
         try {
-            DatabaseViewScene databaseViewScene = new DatabaseViewScene(jdbc.getText(), username.getText(), password.getText());
-            DbAnonymizerApplication.primaryStage.setScene(databaseViewScene);
+            ConnectionFactory.getInstance().setJdbc(jdbc.getText());
+            ConnectionFactory.getInstance().clearConnectionProperties();
+            ConnectionFactory.getInstance().addConnectionProperty(new ConnectionProperty("user", username.getText()));
+            ConnectionFactory.getInstance().addConnectionProperty(new ConnectionProperty("password", password.getText()));
+
+            DbAnonymizerApplication.getInstance().setScene("Database " + jdbc.getText(), "/DatabaseViewScene.fxml");
         } catch (Exception e) {
             log.error("Error loading Database Scene", e);
         }
