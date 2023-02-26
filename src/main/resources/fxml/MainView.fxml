@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.stage.*?>
+
+<Stage maximized="true" minHeight="800.0" minWidth="1280.0" title="Database Anonymizer" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.spirittesting.db.frontend.MainViewController">
+    <scene>
+        <Scene>
+            <VBox>
+                <children>
+                    <MenuBar>
+                        <menus>
+                            <Menu mnemonicParsing="false" text="File">
+                                <items>
+                                    <MenuItem fx:id="menuItemConnect" mnemonicParsing="false" onAction="#doConnect" text="Connect" />
+                                    <MenuItem mnemonicParsing="false" text="Close" />
+                                </items>
+                            </Menu>
+                            <Menu mnemonicParsing="false" text="Edit">
+                                <items>
+                                    <MenuItem mnemonicParsing="false" text="Delete" />
+                                </items>
+                            </Menu>
+                            <Menu mnemonicParsing="false" text="Help">
+                                <items>
+                                    <MenuItem mnemonicParsing="false" text="About" />
+                                </items>
+                            </Menu>
+                        </menus>
+                    </MenuBar>
+                    <AnchorPane VBox.vgrow="ALWAYS">
+                        <children>
+                            <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <bottom>
+                                    <TitledPane text="Log" BorderPane.alignment="CENTER">
+                                        <content>
+                                            <TextArea fx:id="logView" prefHeight="200.0" prefWidth="200.0" />
+                                        </content>
+                                    </TitledPane>
+                                </bottom>
+                                <left>
+                                    <TitledPane collapsible="false" maxHeight="1.7976931348623157E308" text="Tables" BorderPane.alignment="CENTER">
+                                        <content>
+                                            <ListView fx:id="tablesList" prefHeight="200.0" prefWidth="200.0" />
+                                        </content>
+                                    </TitledPane>
+                                </left>
+                                <center>
+                                    <TitledPane collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Table">
+                                        <content>
+                                            <TableView fx:id="columnsTable" prefHeight="200.0" prefWidth="200.0">
+                                                <columns>
+                                                    <TableColumn prefWidth="75.0" text="Column" />
+                                                    <TableColumn prefWidth="75.0" text="Type" />
+                                                    <TableColumn prefWidth="75.0" text="Processing" />
+                                                </columns>
+                                            </TableView>
+                                        </content>
+                                    </TitledPane>
+                                </center>
+                                <right>
+                                    <TitledPane collapsible="false" maxHeight="1.7976931348623157E308" text="Actions" BorderPane.alignment="CENTER">
+                                        <content>
+                                            <ListView fx:id="actionsList" prefHeight="200.0" prefWidth="200.0" />
+                                        </content>
+                                    </TitledPane>
+                                </right>
+                            </BorderPane>
+                        </children>
+                    </AnchorPane>
+                </children>
+            </VBox>
+        </Scene>
+    </scene>
+</Stage>

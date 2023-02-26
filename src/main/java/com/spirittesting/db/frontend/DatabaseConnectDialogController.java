@@ -19,7 +19,6 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 public class DatabaseConnectDialogController implements Initializable {
 
@@ -35,7 +34,6 @@ public class DatabaseConnectDialogController implements Initializable {
 
     @FXML
     Button connectButton;
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -62,8 +60,10 @@ public class DatabaseConnectDialogController implements Initializable {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+
         });
     }
+
 
     private class EditableConnectionProperty {
         private StringProperty key;

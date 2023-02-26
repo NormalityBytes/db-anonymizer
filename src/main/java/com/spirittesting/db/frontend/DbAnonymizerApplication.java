@@ -15,8 +15,12 @@ import java.util.logging.Logger;
 public class DbAnonymizerApplication extends Application {
 
     @Override
-    public void start(Stage stage) throws IOException {
-        LogManager.getLogManager().reset();
+    public void start(Stage primaryStage) throws IOException {
+        FXMLLoader loader = getFxmlLoader("fxml/MainView.fxml");
+        Stage stage  = loader.load();
+        stage.show();
+
+        /*LogManager.getLogManager().reset();
         FXMLLoader loader = getFxmlLoader("fxml/DatabaseConnectDialog.fxml");
         Parent parent = loader.load();
         stage.setTitle("Connect to Database");
@@ -29,7 +33,7 @@ public class DbAnonymizerApplication extends Application {
         logStage.setTitle("Log");
         logStage.setScene(new Scene(logParent));
         logStage.show();
-        logStage.setX(stage.getX() + stage.getWidth());
+        logStage.setX(stage.getX() + stage.getWidth());*/
     }
 
     public static void main(String[] args) {

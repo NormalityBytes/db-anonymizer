@@ -18,27 +18,7 @@ public class LogViewController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        Logger.getLogger("").addHandler(new Handler() {
-
-            @Override
-            public void publish(LogRecord record) {
-                Platform.runLater(() -> {
-                            logview.appendText(record.getLevel() + ": " + record.getMessage() + "\n");
-                        }
-                );
-
-            }
-
-            @Override
-            public void flush() {
-
-            }
-
-            @Override
-            public void close() throws SecurityException {
-
-            }
-        });
+        Logger.getLogger("").addHandler(new LoggingHandler(logview));
     }
 
 }
