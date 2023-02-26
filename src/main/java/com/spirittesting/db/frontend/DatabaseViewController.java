@@ -1,4 +1,4 @@
-package com.spirittesting.db.frontend.databaseview;
+package com.spirittesting.db.frontend;
 
 import com.spirittesting.db.database.ConnectionFactory;
 import com.spirittesting.db.database.Table;
@@ -15,6 +15,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 public class DatabaseViewController implements Initializable {
 
@@ -23,6 +24,8 @@ public class DatabaseViewController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        Logger.getLogger("DatabaseViewController").info("Initializing DatabaseViewController");
 
         databaseTree.setCellFactory(callback -> new TreeCell<>() {
             @Override
@@ -44,7 +47,7 @@ public class DatabaseViewController implements Initializable {
             }
         });
 
-        createTreeNodes();
+        //createTreeNodes();
 
     }
 

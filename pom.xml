@@ -262,6 +262,8 @@
                     <javaOptions>
                         <option>-Dfile.encoding=UTF-8</option>
                     </javaOptions>
+                    <winUpgradeUuid>2c1a53a4-5d3d-427a-b616-3708d1d3ad8c</winUpgradeUuid>
+
                 </configuration>
                 <executions>
                     <execution>

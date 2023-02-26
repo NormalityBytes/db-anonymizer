@@ -1,4 +1,4 @@
-package com.spirittesting.db.frontend.connect;
+package com.spirittesting.db.frontend;
 
 import com.spirittesting.db.database.ConnectionFactory;
 import com.spirittesting.db.database.ConnectionProperty;
@@ -19,6 +19,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 public class DatabaseConnectDialogController implements Initializable {
 
@@ -53,7 +54,7 @@ public class DatabaseConnectDialogController implements Initializable {
             propertiesTable.getItems().forEach(property -> ConnectionFactory.getInstance().addConnectionProperty(property.toConnectionProperty()));
 
             Stage stage = (Stage) jdbcUrlText.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/DatabaseViewScene.fxml"));
+            FXMLLoader loader = DbAnonymizerApplication.getFxmlLoader("fxml/DatabaseView.fxml");
             try {
                 Parent parent = loader.load();
                 stage.setTitle("Database " + jdbcUrlText.getText());
