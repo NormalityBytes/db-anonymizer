@@ -13,15 +13,20 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.stage.Stage;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -55,8 +60,17 @@ public class DatabaseConnectDialogController implements Initializable {
         connectButton.addEventHandler(ActionEvent.ACTION, event -> {
             ConnectionFactory.getInstance().setJdbc(jdbcUrlText.getText());
             ConnectionFactory.getInstance().clearConnectionProperties();
-            propertiesTable.getItems().forEach(editableConnectionProperty -> ConnectionFactory.getInstance().addConnectionProperty(editableConnectionProperty.toConnectionProperty()));
-            DbAnonymizerApplication.getInstance().setScene("Database " + jdbcUrlText.getText(), "/DatabaseViewScene.fxml");
+            propertiesTable.getItems().forEach(property -> ConnectionFactory.getInstance().addConnectionProperty(property.toConnectionProperty()));
+
+            Stage stage = (Stage) jdbcUrlText.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/DatabaseViewScene.fxml"));
+            try {
+                Parent parent = loader.load();
+                stage.setTitle("Database " + jdbcUrlText.getText());
+                stage.setScene(new Scene(parent));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         });
     }
 

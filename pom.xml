@@ -16,12 +16,33 @@
         <compiler-plugin.version>3.10.1</compiler-plugin.version>
         <javafx-plugin.version>0.0.8</javafx-plugin.version>
 
+        <checker-qual.version>3.31.0</checker-qual.version>
         <javafx.version>19.0.2</javafx.version>
         <lombok.version>1.18.24</lombok.version>
         <logback.version>1.2.11</logback.version>
         <postgresql.version>42.3.8</postgresql.version>
         <slf4j.version>1.7.36</slf4j.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -31,18 +52,11 @@
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>${logback.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>${logback.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -58,6 +72,11 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <version>${postgresql.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.checkerframework</groupId>
+            <artifactId>checker-qual</artifactId>
+            <version>${checker-qual.version}</version>
         </dependency>
     </dependencies>
 
@@ -89,6 +108,58 @@
                         <arg>--add-modules</arg>
                         <arg>javafx.controls</arg>
                     </compilerArgs>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.moditect</groupId>
+                <artifactId>moditect-maven-plugin</artifactId>
+                <version>1.0.0.RC2</version>
+                <executions>
+                    <execution>
+                        <id>generate-module-info</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate-module-info</goal>
+                        </goals>
+                        <configuration>
+                            <modules>
+                                <module>
+                                    <artifact>
+                                        <groupId>org.checkerframework</groupId>
+                                        <artifactId>checker-qual</artifactId>
+                                        <version>${checker-qual.version}</version>
+                                    </artifact>
+                                    <moduleInfo>
+                                        <name>org.checkerframework.checker.qual</name>
+                                        <exports>
+                                            *;
+                                        </exports>
+                                        <addServiceUses>true</addServiceUses>
+                                    </moduleInfo>
+                                </module>
+                            </modules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.4.0</version>
+                <configuration>
+                    <name>DbAnonymizer</name>
+                    <appVersion>1.0.0</appVersion>
+                    <vendor>com.spirittesting</vendor>
+                    <destination>target/dist</destination>
+                    <module>com.spirittesting.dbanonymizer/com.spirittesting.db.frontend.DbAnonymizerApplication</module>
+                    <runtimeImage>${java.home}</runtimeImage>
+                    <modulePaths>
+                        <modulePath>target/classes</modulePath>
+                    </modulePaths>
+                    <javaOptions>
+                        <option>-Dfile.encoding=UTF-8</option>
+                    </javaOptions>
+
                 </configuration>
             </plugin>
         </plugins>

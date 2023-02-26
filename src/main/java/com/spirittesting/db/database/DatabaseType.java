@@ -36,6 +36,7 @@ public enum DatabaseType {
         this.jdbcPattern = Pattern.compile(jdbcPattern);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T extends Driver> T getDriver(String jdbc) {
         try {
             for (DatabaseType type : values()) {
