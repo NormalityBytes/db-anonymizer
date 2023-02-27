@@ -2,15 +2,12 @@ package com.spirittesting.db.frontend;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 public class DbAnonymizerApplication extends Application {
 
@@ -19,21 +16,6 @@ public class DbAnonymizerApplication extends Application {
         FXMLLoader loader = getFxmlLoader("fxml/MainView.fxml");
         Stage stage  = loader.load();
         stage.show();
-
-        /*LogManager.getLogManager().reset();
-        FXMLLoader loader = getFxmlLoader("fxml/DatabaseConnectDialog.fxml");
-        Parent parent = loader.load();
-        stage.setTitle("Connect to Database");
-        stage.setScene(new Scene(parent));
-        stage.show();
-
-        FXMLLoader logLoader = getFxmlLoader("fxml/LogView.fxml");
-        Parent logParent = logLoader.load();
-        Stage logStage = new Stage();
-        logStage.setTitle("Log");
-        logStage.setScene(new Scene(logParent));
-        logStage.show();
-        logStage.setX(stage.getX() + stage.getWidth());*/
     }
 
     public static void main(String[] args) {

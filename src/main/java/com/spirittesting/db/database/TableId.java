@@ -10,4 +10,12 @@ public record TableId(String catalog, String schema, String table) implements Co
         if (!Objects.equals(schema, o.schema)) return schema.compareTo(o.schema);
         return table.compareTo(o.table);
     }
+
+    @Override
+    public String toString() {
+        String result = table;
+        if (schema != null) result = schema + "." + result;
+        if (catalog != null) result = catalog + "." + result;
+        return result;
+    }
 }
