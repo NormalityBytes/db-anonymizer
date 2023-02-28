@@ -38,6 +38,8 @@ public class DbAnonymizerApplication extends Application {
             stage.setTitle("Error");
             stage.setScene(new Scene(textArea));
             stage.show();
+
+            e.printStackTrace();
         }
     }
 }

@@ -49,15 +49,9 @@
                                 </left>
                                 <center>
                                     <TitledPane collapsible="false" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" text="Table">
-                                        <content>
-                                            <TableView fx:id="columnsTable" prefHeight="200.0" prefWidth="200.0">
-                                                <columns>
-                                                    <TableColumn prefWidth="75.0" text="Column" />
-                                                    <TableColumn prefWidth="75.0" text="Type" />
-                                                    <TableColumn prefWidth="75.0" text="Processing" />
-                                                </columns>
-                                            </TableView>
-                                        </content>
+                              <content>
+                                 <Pane fx:id="tablesPane" prefHeight="200.0" prefWidth="200.0" />
+                              </content>
                                     </TitledPane>
                                 </center>
                                 <right>
