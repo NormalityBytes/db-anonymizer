@@ -1,43 +1,60 @@
 package com.spirittesting.db.frontend.components;
 
 import com.spirittesting.db.FxmlView;
-import com.spirittesting.db.database.Column;
-import com.spirittesting.db.database.ConnectionFactory;
-import com.spirittesting.db.database.ForeignKey;
-import com.spirittesting.db.database.Index;
 import com.spirittesting.db.database.Table;
-import com.spirittesting.db.database.TableId;
+import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TitledPane;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
-import org.controlsfx.control.decoration.Decoration;
-import org.controlsfx.control.decoration.Decorator;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
 public class TableComponent extends FxmlView {
 
     private final Logger log = Logger.getLogger(getClass().getName());
+    private final Table table;
+    private final Set<TableColumnModelItem> columns;
 
-    //https://stackoverflow.com/questions/17312734/how-to-make-a-draggable-node-in-javafx-2-0
+    @FXML
+    TitledPane tablePane;
+    @FXML
+    ListView<TableColumnModelItem> columnsList;
 
-    public void startDrag(MouseEvent mouseEvent) {
-        log.info("startDrag");
-        Dragboard db = ((Parent) mouseEvent.getSource()).startDragAndDrop(TransferMode.ANY);
-
-        mouseEvent.consume();
-
+    public TableComponent(Table table) {
+        super();
+        this.table = table;
+        this.columns = TableColumnModelItem.fromTable(table);
     }
 
-    public void stopDrag(DragEvent dragEvent) {
-        log.info("stopDrag");
+    @Override
+    public Parent getView() {
+        Parent view = super.getView();
+        tablePane.setText(table.descriptor().toString());
+        columnsList.getItems().addAll(columns);
+        view.setOnMousePressed(this::onMousePressed);
+        view.setOnMouseDragged(this::onMouseDragged);
+        return view;
     }
+
+    public void onMousePressed(MouseEvent event) {
+        event.setDragDetect(false);
+        Node node = (Node) event.getSource();
+        Point2D offset = new Point2D(event.getX() - node.getLayoutX(), event.getY() - node.getLayoutY());
+        node.setUserData(offset);
+        event.consume();
+    }
+
+    public void onMouseDragged(MouseEvent event) {
+        event.setDragDetect(false);
+        Node node = (Node) event.getSource();
+        Point2D offset = (Point2D) node.getUserData();
+        node.setLayoutX(event.getX() - offset.getX());
+        node.setLayoutY(event.getY() - offset.getY());
+        event.consume();
+    }
+
 }
